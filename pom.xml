@@ -62,6 +62,12 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <javacArgs>
+                        <javacArg>-source</javacArg>
+                        <javacArg>1.7</javacArg>
+                        <javacArg>-target</javacArg>
+                        <javacArg>1.7</javacArg>
+                    </javacArgs>
                     <sourceDir>src/main/scala</sourceDir>
                 </configuration>
             </plugin>
