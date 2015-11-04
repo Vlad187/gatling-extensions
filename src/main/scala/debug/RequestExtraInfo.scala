@@ -6,20 +6,25 @@ import io.gatling.http.request.builder.HttpRequestWithParamsBuilder
 
 import scala.collection.mutable
 
-class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new mutable.HashMap[String, String]() with scala.collection.mutable.SynchronizedMap[String, String]) {
+object ExtraInfoStyle {
+  //TODO move style addition to Extra info data writer
+  var isStyleAdded = false
+  def apply() =
+    if (isStyleAdded) ""
+    else "<style>\nbody { font-family:Calibri; font-size:small; background-color:white; }\nfont { font-family:Calibri; }\nul { padding-top:0px; margin-top:0px; font-family:Calibri; font-size:small; }\nli { padding-top:0px; margin-top:0px; font-family:Calibri; font-size:11pt; }\np { font-family:Calibri; font-size:11pt; }\na { font-family:Calibri; font-size:11pt; color:black; }\nb { font-family:Calibri; font-size:11pt; }\nth { background-color:#4F81BD; color:#eeeeee; font-size:10.5pt; }\ntr { line-height:14pt; }\ntd { border-width:1px; border-bottom-color:#C0C0C0; border-bottom-style:solid; font-size:11pt; }\ntd.runInfo { white-space:nowrap; font-size:11pt; color:#1F497D; border-color:#C0C0C0; border-bottom-style:solid; border-right-style:solid; padding:2px; }\nspan { background-color:#FFFFFF; border-style:solid; border-width:1px; border-color:#bbbbbb; display:inline-block; }\n.AwrComparisonTable TD, .AwrComparisonTable TH { font-size:9pt; white-space: nowrap; }\n.AwrComparisonTable A { font-size:9pt; }\n.AwrComparisonTableTdId { text-align:center; }\n</style>"
+
+}
+
+class RequestExtraInfo(val extraInfoMap: mutable.HashSet[String] = new mutable.HashSet[String]() with scala.collection.mutable.SynchronizedSet[String]) {
 
   implicit class ExtraInfoUtils(requestBuilder: HttpRequestWithParamsBuilder) {
 
     def saveFirstKoExtraInfo(): HttpRequestWithParamsBuilder = requestBuilder.extraInfoExtractor(
       extraInfo => {
         val key = s"${extraInfo.request.getUrl}${extraInfo.response.statusCode.getOrElse(0)}${extraInfo.requestName}"
-        extraInfo.status == KO && extraInfoMap.contains(key).unary_! match {
+        extraInfo.status == KO && !extraInfoMap.contains(key) match {
           case true =>
-            extraInfoMap.put(
-              key,
-              extraInfoFormatter(extraInfo)
-            )
-            List(key, extraInfoMap(key))
+            List(ExtraInfoStyle(), extraInfoFormatter(extraInfo))
           case false => Nil
         }
       }
@@ -28,7 +33,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
     def extraInfoFormatter(extraInfo: ExtraInfo): String =
       <div>
         <br/>
-        <table border="1" style="width:100%">
+        <table style="border-style: solid; border-width: thin medium; border-color: gray; background-color: white; width:100%">
           <tr>
             <td>
               <a name={extraInfo.requestName}>
@@ -40,7 +45,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
           </tr>
           <tr>
             <td>
-              <table border="1">
+              <table style="border-style: solid; border-width: thin medium; border-color: gray; background-color: white; width:100%">
                 <tr>
                   <th colspan="2">
                     <center>
@@ -49,7 +54,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
                   </th>
                 </tr>
                 <tr>
-                  <th>
+                  <th width="8%">
                     <center>Title</center>
                   </th>
                   <th>
@@ -57,37 +62,37 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
                   </th>
                 </tr>
                 <tr>
-                  <td>Method</td>
+                  <th>Method</th>
                   <td>
                     {extraInfo.request.getMethod.replaceAll("\t", "\n ")}
                   </td>
                 </tr>
                 <tr>
-                  <td>Url</td>
+                  <th>Url</th>
                   <td>
                     {extraInfo.request.getUrl.replaceAll("\t", "\n ")}
                   </td>
                 </tr>
                 <tr>
-                  <td>Headers</td>
+                  <th>Headers</th>
                   <td>
                     {extraInfo.request.getHeaders.toString.replaceAll("\t", "\n ")}
                   </td>
                 </tr>
                 <tr>
-                  <td>Form Params</td>
+                  <th>Form Params</th>
                   <td>
                     {extraInfo.request.getFormParams.toString.replaceAll("\t", "\n ")}
                   </td>
                 </tr>
                 <tr>
-                  <td>String Data</td>
+                  <th>String Data</th>
                   <td>
                     {extraInfo.request.getStringData.replaceAll("\t", "\n ")}
                   </td>
                 </tr>
                 <tr>
-                  <td>Query Params</td>
+                  <th>Query Params</th>
                   <td>
                     {extraInfo.request.getQueryParams.toString.replaceAll("\t", "\n ")}
                   </td>
@@ -96,7 +101,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
             </td>
             <tr>
               <td>
-                <table border="1">
+                <table style="border-style: solid; border-width: thin medium; border-color: gray; background-color: white; width:100%">
                   <tr>
                     <th colspan="2">
                       <center>
@@ -105,7 +110,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
                     </th>
                   </tr>
                   <tr>
-                    <th>
+                    <th width="8%">
                       <center>Title</center>
                     </th>
                     <th>
@@ -113,37 +118,37 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
                     </th>
                   </tr>
                   <tr>
-                    <td>Status Code</td>
+                    <th>Status Code</th>
                     <td>
                       {extraInfo.response.statusCode}
                     </td>
                   </tr>
                   <tr>
-                    <td>Response Time In Millis</td>
+                    <th>Response Time In Millis</th>
                     <td>
                       {extraInfo.response.responseTimeInMillis}
                     </td>
                   </tr>
                   <tr>
-                    <td>Is Redirect</td>
+                    <th>Is Redirect</th>
                     <td>
                       {extraInfo.response.isRedirect}
                     </td>
                   </tr>
                   <tr>
-                    <td>Headers</td>
+                    <th>Headers</th>
                     <td>
                       {extraInfo.response.headers}
                     </td>
                   </tr>
                   <tr>
-                    <td>Body</td>
+                    <th>Body</th>
                     <td>
                       {extraInfo.response.body}
                     </td>
                   </tr>
                   <tr>
-                    <td>Cookies</td>
+                    <th>Cookies</th>
                     <td>
                       {extraInfo.response.cookies}
                     </td>
@@ -153,7 +158,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
             </tr>
             <tr>
               <td>
-                <table border="1">
+                <table style="border-style: solid; border-width: thin medium; border-color: gray; background-color: white; width:100%">
                   <tr>
                     <th colspan="2">
                       <center>
@@ -162,7 +167,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
                     </th>
                   </tr>
                   <tr>
-                    <th>
+                    <th width="8%">
                       <center>Title</center>
                     </th>
                     <th>
@@ -170,7 +175,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
                     </th>
                   </tr>
                   <tr>
-                    <td>Attributes</td>
+                    <th>Attributes</th>
                     <td>
                       {extraInfo.session.attributes}
                     </td>
@@ -183,6 +188,7 @@ class RequestExtraInfo(val extraInfoMap: mutable.HashMap[String, String] = new m
         <br/>
       </div>.toString()
 
+    ExtraInfoStyle.isStyleAdded = true
   }
 
 }
