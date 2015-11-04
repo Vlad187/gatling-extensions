@@ -15,15 +15,16 @@ object ExtraInfoStyle {
 
 }
 
-class RequestExtraInfo(val extraInfoMap: mutable.HashSet[String] = new mutable.HashSet[String]() with scala.collection.mutable.SynchronizedSet[String]) {
+class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.HashSet[String]() with scala.collection.mutable.SynchronizedSet[String]) {
 
   implicit class ExtraInfoUtils(requestBuilder: HttpRequestWithParamsBuilder) {
 
     def saveFirstKoExtraInfo(): HttpRequestWithParamsBuilder = requestBuilder.extraInfoExtractor(
       extraInfo => {
         val key = s"${extraInfo.request.getUrl}${extraInfo.response.statusCode.getOrElse(0)}${extraInfo.requestName}"
-        extraInfo.status == KO && !extraInfoMap.contains(key) match {
+        extraInfo.status == KO && !extraInfoSet.contains(key) match {
           case true =>
+            extraInfoSet.add(key)
             List(ExtraInfoStyle(), extraInfoFormatter(extraInfo))
           case false => Nil
         }
