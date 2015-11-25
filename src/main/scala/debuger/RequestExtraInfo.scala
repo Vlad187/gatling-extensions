@@ -1,4 +1,4 @@
-package debug
+package debuger
 
 import io.gatling.core.result.message.KO
 import io.gatling.http.request.ExtraInfo
@@ -7,8 +7,8 @@ import io.gatling.http.request.builder.HttpRequestWithParamsBuilder
 import scala.collection.mutable
 
 object ExtraInfoStyle {
-  //TODO move style addition to Extra info data writer
   var isStyleAdded = false
+
   def apply() =
     if (isStyleAdded) ""
     else "<style>\nbody { font-family:Calibri; font-size:small; background-color:white; }\nfont { font-family:Calibri; }\nul { padding-top:0px; margin-top:0px; font-family:Calibri; font-size:small; }\nli { padding-top:0px; margin-top:0px; font-family:Calibri; font-size:11pt; }\np { font-family:Calibri; font-size:11pt; }\na { font-family:Calibri; font-size:11pt; color:black; }\nb { font-family:Calibri; font-size:11pt; }\nth { background-color:#4F81BD; color:#eeeeee; font-size:10.5pt; }\ntr { line-height:14pt; }\ntd { border-width:1px; border-bottom-color:#C0C0C0; border-bottom-style:solid; font-size:11pt; }\ntd.runInfo { white-space:nowrap; font-size:11pt; color:#1F497D; border-color:#C0C0C0; border-bottom-style:solid; border-right-style:solid; padding:2px; }\nspan { background-color:#FFFFFF; border-style:solid; border-width:1px; border-color:#bbbbbb; display:inline-block; }\n.AwrComparisonTable TD, .AwrComparisonTable TH { font-size:9pt; white-space: nowrap; }\n.AwrComparisonTable A { font-size:9pt; }\n.AwrComparisonTableTdId { text-align:center; }\n</style>"
@@ -31,7 +31,8 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
       }
     )
 
-    def extraInfoFormatter(extraInfo: ExtraInfo): String =
+    def extraInfoFormatter(extraInfo: ExtraInfo): String = {
+      ExtraInfoStyle.isStyleAdded = true
       <div>
         <br/>
         <table style="border-style: solid; border-width: thin medium; border-color: gray; background-color: white; width:100%">
@@ -95,7 +96,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                 <tr>
                   <th>Query Params</th>
                   <td>
-                    {extraInfo.request.getQueryParams.toString.replaceAll("\t", "\n ")}
+                    {extraInfo.request.getQueryParams.toArray.mkString("\n")}
                   </td>
                 </tr>
               </table>
@@ -178,7 +179,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                   <tr>
                     <th>Attributes</th>
                     <td>
-                      {extraInfo.session.attributes}
+                      {extraInfo.session.attributes.dropRight(1)}
                     </td>
                   </tr>
                 </table>
@@ -188,8 +189,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
         </table>
         <br/>
       </div>.toString()
-
-    ExtraInfoStyle.isStyleAdded = true
+    }
   }
 
 }
