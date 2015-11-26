@@ -1,10 +1,11 @@
-package debuger
+package debug
 
 import io.gatling.core.result.message.KO
 import io.gatling.http.request.ExtraInfo
 import io.gatling.http.request.builder.HttpRequestWithParamsBuilder
 
 import scala.collection.mutable
+import scala.util.Try
 
 object ExtraInfoStyle {
   var isStyleAdded = false
@@ -24,7 +25,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
         val key = s"${extraInfo.request.getUrl}${extraInfo.response.statusCode.getOrElse(0)}${extraInfo.requestName}"
         extraInfo.status == KO && !extraInfoSet.contains(key) match {
           case true =>
-            extraInfoSet.add(key)
+          extraInfoSet.add(key)
             List(ExtraInfoStyle(), extraInfoFormatter(extraInfo))
           case false => Nil
         }
@@ -40,7 +41,9 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
             <td>
               <a name={extraInfo.requestName}>
                 <b>
-                  {extraInfo.requestName}
+                  {Try {
+                  extraInfo.requestName
+                }.getOrElse(Const.NO_DATA_MASSAGE)}
                 </b>
               </a>
             </td>
@@ -66,37 +69,49 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                 <tr>
                   <th>Method</th>
                   <td>
-                    {extraInfo.request.getMethod.replaceAll("\t", "\n ")}
+                    {Try {
+                    extraInfo.request.getMethod.replaceAll("\t", "\n ")
+                  }.getOrElse(Const.NO_DATA_MASSAGE)}
                   </td>
                 </tr>
                 <tr>
                   <th>Url</th>
                   <td>
-                    {extraInfo.request.getUrl.replaceAll("\t", "\n ")}
+                    {Try {
+                    extraInfo.request.getUrl.replaceAll("\t", "\n ")
+                  }.getOrElse(Const.NO_DATA_MASSAGE)}
                   </td>
                 </tr>
                 <tr>
                   <th>Headers</th>
                   <td>
-                    {extraInfo.request.getHeaders.toString.replaceAll("\t", "\n ")}
+                    {Try {
+                    extraInfo.request.getHeaders.toString.replaceAll("\t", "\n ")
+                  }.getOrElse(Const.NO_DATA_MASSAGE)}
                   </td>
                 </tr>
                 <tr>
                   <th>Form Params</th>
                   <td>
-                    {extraInfo.request.getFormParams.toString.replaceAll("\t", "\n ")}
+                    {Try {
+                    extraInfo.request.getFormParams.toString.replaceAll("\t", "\n ")
+                  }.getOrElse(Const.NO_DATA_MASSAGE)}
                   </td>
                 </tr>
                 <tr>
                   <th>String Data</th>
                   <td>
-                    {extraInfo.request.getStringData.replaceAll("\t", "\n ")}
+                    {Try {
+                    extraInfo.request.getStringData.replaceAll("\t", "\n ")
+                  }.getOrElse(Const.NO_DATA_MASSAGE)}
                   </td>
                 </tr>
                 <tr>
                   <th>Query Params</th>
                   <td>
-                    {extraInfo.request.getQueryParams.toArray.mkString("\n")}
+                    {Try {
+                    extraInfo.request.getQueryParams.toArray.mkString("\n")
+                  }.getOrElse(Const.NO_DATA_MASSAGE)}
                   </td>
                 </tr>
               </table>
@@ -122,37 +137,49 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                   <tr>
                     <th>Status Code</th>
                     <td>
-                      {extraInfo.response.statusCode}
+                      {Try {
+                      extraInfo.response.statusCode
+                    }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
                   <tr>
                     <th>Response Time In Millis</th>
                     <td>
-                      {extraInfo.response.responseTimeInMillis}
+                      {Try {
+                      extraInfo.response.responseTimeInMillis
+                    }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
                   <tr>
                     <th>Is Redirect</th>
                     <td>
-                      {extraInfo.response.isRedirect}
+                      {Try {
+                      extraInfo.response.isRedirect
+                    }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
                   <tr>
                     <th>Headers</th>
                     <td>
-                      {extraInfo.response.headers}
+                      {Try {
+                      extraInfo.response.headers
+                    }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
                   <tr>
                     <th>Body</th>
                     <td>
-                      {extraInfo.response.body}
+                      {Try {
+                      extraInfo.response.body
+                    }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
                   <tr>
                     <th>Cookies</th>
                     <td>
-                      {extraInfo.response.cookies}
+                      {Try {
+                      extraInfo.response.cookies
+                    }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
                 </table>
@@ -179,7 +206,9 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                   <tr>
                     <th>Attributes</th>
                     <td>
-                      {extraInfo.session.attributes.dropRight(1)}
+                      {Try {
+                      extraInfo.session.attributes.dropRight(1)
+                    }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
                 </table>
