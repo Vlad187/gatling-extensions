@@ -25,7 +25,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
         val key = s"${extraInfo.request.getUrl}${extraInfo.response.statusCode.getOrElse(0)}${extraInfo.requestName}"
         extraInfo.status == KO && !extraInfoSet.contains(key) match {
           case true =>
-          extraInfoSet.add(key)
+            extraInfoSet.add(key)
             List(ExtraInfoStyle(), extraInfoFormatter(extraInfo))
           case false => Nil
         }
@@ -170,7 +170,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                     <th>Body</th>
                     <td>
                       {Try {
-                      extraInfo.response.body
+                      scala.io.Source.fromInputStream(extraInfo.response.body.stream).mkString
                     }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
