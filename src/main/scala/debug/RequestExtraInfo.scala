@@ -20,9 +20,14 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
 
   implicit class ExtraInfoUtils(requestBuilder: HttpRequestWithParamsBuilder) {
 
-    def saveFirstKoExtraInfo(): HttpRequestWithParamsBuilder = requestBuilder.extraInfoExtractor(
+    def saveFirstKoExtraInfo(alternateId: String): HttpRequestWithParamsBuilder = requestBuilder.extraInfoExtractor(
       extraInfo => {
-        val key = s"${extraInfo.request.getUrl}${extraInfo.response.statusCode.getOrElse(0)}${extraInfo.requestName}"
+        val key =
+          if (alternateId.nonEmpty) {
+            s"$alternateId${extraInfo.response.statusCode.getOrElse(0)}${extraInfo.requestName}"
+          } else {
+            s"${extraInfo.request.getUrl}${extraInfo.response.statusCode.getOrElse(0)}${extraInfo.requestName}"
+          }
         extraInfo.status == KO && !extraInfoSet.contains(key) match {
           case true =>
             extraInfoSet.add(key)
@@ -207,7 +212,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                     <th>Attributes</th>
                     <td>
                       {Try {
-                      extraInfo.session.attributes.dropRight(1)
+                      extraInfo.session.attributes.toString()
                     }.getOrElse(Const.NO_DATA_MASSAGE)}
                     </td>
                   </tr>
