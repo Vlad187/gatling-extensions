@@ -8,12 +8,11 @@ import scala.collection.mutable
 import scala.util.Try
 
 object ExtraInfoStyle {
-  var isStyleAdded = false
-
-  def apply() =
-    if (isStyleAdded) ""
-    else "<style>\nbody { font-family:Calibri; font-size:small; background-color:white; }\nfont { font-family:Calibri; }\nul { padding-top:0px; margin-top:0px; font-family:Calibri; font-size:small; }\nli { padding-top:0px; margin-top:0px; font-family:Calibri; font-size:11pt; }\np { font-family:Calibri; font-size:11pt; }\na { font-family:Calibri; font-size:11pt; color:black; }\nb { font-family:Calibri; font-size:11pt; }\nth { background-color:#4F81BD; color:#eeeeee; font-size:10.5pt; }\ntr { line-height:14pt; }\ntd { border-width:1px; border-bottom-color:#C0C0C0; border-bottom-style:solid; font-size:11pt; }\ntd.runInfo { white-space:nowrap; font-size:11pt; color:#1F497D; border-color:#C0C0C0; border-bottom-style:solid; border-right-style:solid; padding:2px; }\nspan { background-color:#FFFFFF; border-style:solid; border-width:1px; border-color:#bbbbbb; display:inline-block; }\n.AwrComparisonTable TD, .AwrComparisonTable TH { font-size:9pt; white-space: nowrap; }\n.AwrComparisonTable A { font-size:9pt; }\n.AwrComparisonTableTdId { text-align:center; }\n</style>"
-
+  val synchronizedList = new scala.collection.mutable.ArrayBuffer[String]() with scala.collection.mutable.SynchronizedBuffer[String]
+  if (synchronizedList.nonEmpty) ""
+  else {
+    synchronizedList += "<style>\ntable{table-layout:auto; word-break:break-all;}\nbody { font-family:Calibri; font-size:small; background-color:white; }\nfont { font-family:Calibri; }\nul { padding-top:0px; margin-top:0px; font-family:Calibri; font-size:small; }\nli { padding-top:0px; margin-top:0px; font-family:Calibri; font-size:11pt; }\np { font-family:Calibri; font-size:11pt; }\na { font-family:Calibri; font-size:11pt; color:black; }\nb { font-family:Calibri; font-size:11pt; }\nth { background-color:#4F81BD; color:#eeeeee; font-size:10.5pt; }\ntr { line-height:14pt; }\ntd { border-width:1px; border-bottom-color:#C0C0C0; border-bottom-style:solid; font-size:11pt; }\ntd.runInfo { white-space:nowrap; font-size:11pt; color:#1F497D; border-color:#C0C0C0; border-bottom-style:solid; border-right-style:solid; padding:2px; }\nspan { background-color:#FFFFFF; border-style:solid; border-width:1px; border-color:#bbbbbb; display:inline-block; }\n.AwrComparisonTable TD, .AwrComparisonTable TH { font-size:9pt; white-space: nowrap; }\n.AwrComparisonTable A { font-size:9pt; }\n.AwrComparisonTableTdId { text-align:center; }\n</style>"
+  }
 }
 
 class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.HashSet[String]() with scala.collection.mutable.SynchronizedSet[String]) {
@@ -30,15 +29,15 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
           }
         extraInfo.status == KO && !extraInfoSet.contains(key) match {
           case true =>
+            ExtraInfoStyle.synchronizedList += extraInfoFormatter(extraInfo)
             extraInfoSet.add(key)
-            List(ExtraInfoStyle(), extraInfoFormatter(extraInfo))
+            List(extraInfoFormatter(extraInfo))
           case false => Nil
         }
       }
     )
 
     def extraInfoFormatter(extraInfo: ExtraInfo): String = {
-      ExtraInfoStyle.isStyleAdded = true
       <div>
         <br/>
         <table style="border-style: solid; border-width: thin medium; border-color: gray; background-color: white; width:100%">
@@ -64,7 +63,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                   </th>
                 </tr>
                 <tr>
-                  <th width="8%">
+                  <th>
                     <center>Title</center>
                   </th>
                   <th>
@@ -132,7 +131,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                     </th>
                   </tr>
                   <tr>
-                    <th width="8%">
+                    <th>
                       <center>Title</center>
                     </th>
                     <th>
@@ -201,7 +200,7 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
                     </th>
                   </tr>
                   <tr>
-                    <th width="8%">
+                    <th>
                       <center>Title</center>
                     </th>
                     <th>
