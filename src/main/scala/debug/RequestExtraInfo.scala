@@ -7,7 +7,7 @@ import io.gatling.http.request.builder.HttpRequestWithParamsBuilder
 import scala.collection.mutable
 import scala.util.Try
 
-object ExtraInfoStyle {
+object RequestExtraInfo {
   val synchronizedList = new scala.collection.mutable.ArrayBuffer[String]() with scala.collection.mutable.SynchronizedBuffer[String]
   if (synchronizedList.nonEmpty) ""
   else {
@@ -29,9 +29,9 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
           }
         extraInfo.status == KO && !extraInfoSet.contains(key) match {
           case true =>
-            ExtraInfoStyle.synchronizedList += extraInfoFormatter(extraInfo)
+            RequestExtraInfo.synchronizedList += extraInfoFormatter(extraInfo)
             extraInfoSet.add(key)
-            List(extraInfoFormatter(extraInfo))
+            List()
           case false => Nil
         }
       }
