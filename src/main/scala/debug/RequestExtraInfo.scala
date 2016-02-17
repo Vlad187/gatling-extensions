@@ -27,11 +27,15 @@ class RequestExtraInfo(val extraInfoSet: mutable.HashSet[String] = new mutable.H
           } else {
             s"${extraInfo.request.getUrl}${extraInfo.response.statusCode.getOrElse(0)}${extraInfo.requestName}"
           }
-        extraInfo.status == KO && !extraInfoSet.contains(key) match {
+        extraInfo.status == KO match {
           case true =>
-            RequestExtraInfo.synchronizedList += extraInfoFormatter(extraInfo)
-            extraInfoSet.add(key)
-            List()
+            synchronized {
+              if (!extraInfoSet.contains(key)) {
+                extraInfoSet.add(key)
+                RequestExtraInfo.synchronizedList += extraInfoFormatter(extraInfo)
+              }
+            }
+            Nil
           case false => Nil
         }
       }
